@@ -12,6 +12,14 @@ pipeline {
                 sh 'mvn package'
             }
         }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    // Run SonarQube analysis
+                    sh 'mvn sonar:sonarcubeanalysis'
+                }
+            }
+        }
 
         stage('Push') {
             steps {
