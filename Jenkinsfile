@@ -16,8 +16,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     // Run SonarQube analysis
-                   sh 'mvn sonar:sonar'
-'
+                    sh 'mvn sonar:sonar'
                 }
             }
         }
@@ -32,10 +31,11 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Build'
+                echo 'Deploy'
 
                 sh "aws lambda update-function-code --function-name $function_name --region us-east-2 --s3-bucket jenkinsbucket28 --s3-key sample-1.0.3.jar"
             }
         }
     }
 }
+
