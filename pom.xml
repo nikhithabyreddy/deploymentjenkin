@@ -18,7 +18,7 @@
 		<java.version>1.8</java.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<sonar.organizations>nikhithabyreddy<sonar.organizations>
+		<sonar.organization>nikhithabyreddy<sonar.organization>
 			<sonar.projectKey>nikhithabyreddy</sonar.projectKey>
 	</properties>
 	<dependencies>
