@@ -16,7 +16,8 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     // Run SonarQube analysis
-                    sh 'mvn sonar:sonarcubeanalysis'
+                    sh 'mvn sonar:sonar
+'
                 }
             }
         }
