@@ -46,7 +46,7 @@ pipeline {
                       body: "The Jenkins build was successful. You can find the artifacts at <insert artifact location>",
                       to: "nikireddy2109@gmail.com",
                       
-        }
+        
         failure {
             echo 'This step will only execute on failed builds'
             emailext subject: "Jenkins Build Failed",
