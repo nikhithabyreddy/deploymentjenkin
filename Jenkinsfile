@@ -9,6 +9,9 @@ pipeline {
 
     environment {
         function_name = 'jenkins'
+        AWS_REGION = 'us-east-2'
+        S3_BUCKET = 'jenkinsbucket28'
+        S3_KEY = 'sample-1.0.3.jar'
     }
 
     stages {
@@ -37,15 +40,12 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploy'
-                sh "aws lambda update-function-code --function-name $function_name --region us-east-2 --s3-bucket jenkinsbucket28 --s3-key sample-1.0.3.jar"
+                sh "aws lambda update-function-code --function-name $function_name --region $AWS_REGION --s3-bucket $S3_BUCKET --s3-key $S3_KEY"
             }
         }
         
         stage('Production Confirmation') {
             steps {
-                 when {
-                    expression { return params.ENVIRONMENT == 'prod' }
-                }
                 echo 'Are you ready for production?'
                 // Input step highlighted below
                 input(message: 'Are you ready for production?', ok: 'Proceed to production')
@@ -71,6 +71,7 @@ pipeline {
         }
     }
 }
+
 
 
 
