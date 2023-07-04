@@ -1,5 +1,12 @@
 pipeline {
     agent any
+    parameters{
+        
+    choice(
+        choices:['Dev','Test','Prod'],
+        name:'Environment'
+        )
+    }
 
     environment {
         function_name = 'jenkins'
