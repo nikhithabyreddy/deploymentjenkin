@@ -1,14 +1,15 @@
 pipeline {
     agent any
+    parameters{
+        
+    choice(
+        choices:['Dev','Test','Prod'],
+        name:'Environment'
+        )
+    }
 
     environment {
         function_name = 'jenkins'
-    }
-    parameters {
-        choice(
-            choices:['Dev','Test','Prod'],
-            name:'Environment'
-        )
     }
 
     stages {
@@ -18,33 +19,11 @@ pipeline {
                 sh 'mvn package'
             }
         }
-        
-        stage('SonarQube analysis') {
-            when {
-                anyOf {
-                    branch 'main'
-                }
-            }
+        stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonarqube') {
-                    echo 'Scanning'
+                withSonarQubeEnv('SonarQube') {
+                    // Run SonarQube analysis
                     sh 'mvn sonar:sonar'
-                }
-            }
-        }
-        
-        stage("Quality Gate") {
-            steps {
-                script {
-                    try {
-                        timeout(time: 1, unit: 'MINUTES') {
-                            def qualityGate = waitForQualityGate abortPipeline: true
-                            echo "Quality Gate status is ${qualityGate.status}"
-                            echo "Quality Gate details: ${qualityGate}"
-                        }
-                    } catch (Exception e) {
-                        echo "Quality Gate failed: ${e.getMessage()}"
-                    }
                 }
             }
         }
@@ -52,39 +31,35 @@ pipeline {
         stage('Push') {
             steps {
                 echo 'Push'
-                sh "aws s3 cp target/sample-1.0.3.jar s3://jenkinsbuckets"
+                sh "aws s3 cp target/sample-1.0.3.jar s3://jenkinsbucket28"
             }
         }
 
-        stage('Deploy to test') {
+        stage('Deploy') {
             steps {
-                echo 'Build'
-                sh "aws lambda update-function-code --function-name $function_name --region us-east-1 --s3-bucket jenkinsbucket28 --s3-key sample-1.0.3.jar"
-            }
-        }
-
-        stage('Deploy to Prod') {
-            steps {
-                when {
-                    expression { params.Environment == 'Prod' }
-                }
-                echo 'Build'
-                input(message: 'Are we good for production?')
-                sh "aws lambda update-function-code --function-name $function_name --region us-east-1 --s3-bucket jenkinsbucket28 --s3-key sample-1.0.3.jar"
+                echo 'Deploy'
+                sh "aws lambda update-function-code --function-name $function_name --region us-east-2 --s3-bucket jenkinsbucket28 --s3-key sample-1.0.3.jar"
             }
         }
     }
 
     post {
         always {
-            mail(
-                body: 'Whatever',
-                subject: 'Jenkins Build Notification',
-                to: 'nikithareddy2109@gmail.com'
-            )
+            echo 'This step will always execute'
+        }
+        success {
+            echo 'This step will only execute on successful builds'
+            emailext subject: "Jenkins Build Success",
+                      body: "The Jenkins build was successful. You can find the artifacts at <insert artifact location>",
+                      to: "nikireddy2109@gmail.com"
+        }
+        failure {
+            echo 'This step will only execute on failed builds'
+            emailext subject: "Jenkins Build Failed",
+                      body: "The Jenkins build failed. Please investigate the issue.",
+                      to: "nikireddy2109@gmail.com"
         }
     }
 }
-
 
 
