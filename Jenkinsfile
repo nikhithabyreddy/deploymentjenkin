@@ -44,7 +44,7 @@ pipeline {
         stage('Production Confirmation') {
             steps {
                  when {
-                    expression { params.ENVIRONMENT == 'prod' }
+                    expression { return params.ENVIRONMENT == 'prod' }
                 }
                 echo 'Are you ready for production?'
                 // Input step highlighted below
