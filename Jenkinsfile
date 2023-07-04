@@ -1,11 +1,10 @@
 pipeline {
     agent any
-    parameters{
-        
-    choice(
-        choices:['Dev','Test','Prod'],
-        name:'Environment'
-        )
+
+    parameters {
+        string(name: 'PARAMETER_NAME', defaultValue: 'default_value', description: 'Parameter description')
+        booleanParam(name: 'ENABLE_FEATURE', defaultValue: true, description: 'Enable feature flag')
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'prod'], description: 'Select deployment environment')
     }
 
     environment {
@@ -41,6 +40,14 @@ pipeline {
                 sh "aws lambda update-function-code --function-name $function_name --region us-east-2 --s3-bucket jenkinsbucket28 --s3-key sample-1.0.3.jar"
             }
         }
+        
+        stage('Production Confirmation') {
+            steps {
+                echo 'Are you ready for production?'
+                // Input step highlighted below
+                input(message: 'Are you ready for production?', ok: 'Proceed to production')
+            }
+        }
     }
 
     post {
@@ -61,5 +68,6 @@ pipeline {
         }
     }
 }
+
 
 
